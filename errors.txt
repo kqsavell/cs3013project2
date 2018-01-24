@@ -1,0 +1,40 @@
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c:28:1: warning: data definition has no type or storage class
+ reg_user = current_uid();
+ ^
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c:28:1: error: type defaults to ‘int’ in declaration of ‘reg_user’ [-Werror=implicit-int]
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c:28:1: error: conflicting types for ‘reg_user’
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c:27:16: note: previous declaration of ‘reg_user’ was here
+ struct kuid_t *reg_user;
+                ^
+In file included from ./include/linux/seq_file.h:12:0,
+                 from ./include/linux/ring_buffer.h:6,
+                 from ./include/linux/trace_events.h:6,
+                 from ./include/trace/syscall.h:7,
+                 from ./include/linux/syscalls.h:82,
+                 from /home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c:15:
+./include/linux/cred.h:353:1: error: braced-group within expression allowed only inside a function
+ ({      \
+ ^
+./include/linux/cred.h:357:25: note: in expansion of macro ‘current_cred_xxx’
+ #define current_uid()  (current_cred_xxx(uid))
+                         ^
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c:28:12: note: in expansion of macro ‘current_uid’
+ reg_user = current_uid();
+            ^
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c: In function ‘new_sys_open’:
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c:38:17: error: invalid type argument of ‘->’ (have ‘int’)
+     if (reg_user->val >= 1000)
+                 ^
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c: In function ‘new_sys_read’:
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c:46:17: error: invalid type argument of ‘->’ (have ‘int’)
+     if (reg_user->val >= 1000)
+                 ^
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c: In function ‘new_sys_close’:
+/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.c:54:17: error: invalid type argument of ‘->’ (have ‘int’)
+     if (reg_user->val >= 1000)
+                 ^
+cc1: some warnings being treated as errors
+make[2]: *** [/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2/p2.o] Error 1
+make[1]: *** [_module_/home/antonyqin/aeqin_project2/cs3013project2.git/cs3013project2] Error 2
+make: *** [all] Error 2
+
