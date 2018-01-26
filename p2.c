@@ -22,9 +22,7 @@ asmlinkage long new_sys_cs3013_syscall1(void)
     return 0;
 }*/
 
-unsigned long **sys_call_table;
-struct kuid_t *reg_user;
-reg_user = current_uid();
+unsigned long **sys_call_table;\
 
 /* -- Our own storage values for sys_calls -- */
 asmlinkage int (*real_open)(const char __user *filename, int flags, int mode);
@@ -34,15 +32,15 @@ asmlinkage int (*real_close)(unsigned int fd);
 /* -- Our own functions for intercepted variables -- */
 asmlinkage int new_sys_open(const char __user *filename, int flags, int mode) // Intercept open
 {
-    if (reg_user->val >= 1000)
+    if (current_uid().val >= 1000)
     {
-    printk(KERN_INFO "dalek kernel: User is opening file (%s, %X, %X)", filename, flags, mode);
+        printk(KERN_INFO "dalek kernel: User %d is opening file (%s, %X, %X)", current_uid().val, filename, flags, mode);
     }
     return real_open(filename, flags, mode);
 }
 asmlinkage int new_sys_read(unsigned int fd, char __user *buf, size_t count) //Intercept read
 {
-    if (reg_user->val >= 1000)
+    if (current_uid().val >= 1000)
     {
         printk(KERN_INFO "interceptor: read(%s)", buf);
     }
@@ -50,9 +48,9 @@ asmlinkage int new_sys_read(unsigned int fd, char __user *buf, size_t count) //I
 }
 asmlinkage int new_sys_close(unsigned int fd) //Intercept write
 {
-    if (reg_user->val >= 1000)
+    if (current_uid().val >= 1000)
     {
-        printk(KERN_INFO "dalek kernel: User is closing file descriptor");
+        printk(KERN_INFO "dalek kernel: User %d is closing file descriptor", current_uid().val);
     }
     return real_close(fd);
 }
