@@ -1,32 +1,16 @@
-//Kyle Savell & Antony Qin
-//OS Project 2
-
-//Undefine and redefine in Kernel space
-#undef __KERNEL__
-#undef MODULE
-
-#define __KERNEL__
-#define MODULE
-
-//Part 1:
-
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/syscalls.h>
 
-/* -- Reference code -- */
-/*asmlinkage long (*ref_sys_cs3013_syscall1)(void);
+unsigned long **sys_call_table;
+asmlinkage long (*ref_sys_cs3013_syscall1)(void);
+
 asmlinkage long new_sys_cs3013_syscall1(void)
 {
-    printk(KERN_INFO "\"’Hello world?!’ More like ’Goodbye, world!’ EXTERMINATE! TEST\" -- Dalek");
+    printk(KERN_INFO "\"’Hello world?!’ More like ’Goodbye, world!’ EXTERMINATE!\" -- Dalek");
     return 0;
-}*/
+}
 
-unsigned long **sys_call_table;
-struct kuid_t *reg_user;
-reg_user = current_uid();
-
-/* -- Our own storage values for sys_calls -- */
 asmlinkage int (*real_open)(const char __user *filename, int flags, int mode);
 asmlinkage int (*real_read)(unsigned int fd, char __user *buf, size_t count);
 asmlinkage int (*real_close)(unsigned int fd);
@@ -34,26 +18,64 @@ asmlinkage int (*real_close)(unsigned int fd);
 /* -- Our own functions for intercepted variables -- */
 asmlinkage int new_sys_open(const char __user *filename, int flags, int mode) // Intercept open
 {
-    if (reg_user->val >= 1000)
+    int file;
+    char buf[1];
+
+    mm_segment_t old_fs = get_fs();
+    set_fs(KERNEL_DS);
+
+    file = real_open(filename, O_RDONLY, 0); // O_RDONLY means reading only
+    if(file >= 0)
     {
-    printk(KERN_INFO "dalek kernel: User is opening file (%s, %X, %X)", filename, flags, mode);
+        int counter = 0;
+        int yesVirus = -1;
+
+        while(real_read(file, buf, 1) == 1)
+        {
+            if(counter == 4 && buf[0] == 's')
+            {
+                yesVirus = 0;
+                break;
+            }
+            else if(counter == 4)
+                counter = 0;
+
+            if(counter == 3 && buf[0] == 'u')
+                counter++;
+            else if(counter == 3)
+                counter = 0;
+
+            if(counter == 2 && buf[0] == 'r')
+                counter++;
+            else if(counter == 2)
+                counter = 0;
+
+            if(counter == 1 && buf[0] == 'i')
+                counter++;
+            else if(counter == 1)
+                counter = 0;
+
+            if(counter == 0 && buf[0] == 'v')
+            {
+                counter++;
+            }
+        }
+
+        real_close(file);
+
+        if(yesVirus == 0)
+            printk(KERN_INFO "ON NOES: ENCOUNTERED A SCARY VIRUS\n");
     }
+    set_fs(old_fs);
+
     return real_open(filename, flags, mode);
 }
 asmlinkage int new_sys_read(unsigned int fd, char __user *buf, size_t count) //Intercept read
 {
-    if (reg_user->val >= 1000)
-    {
-        printk(KERN_INFO "interceptor: read(%s)", buf);
-    }
     return real_read(fd, buf, count);
 }
 asmlinkage int new_sys_close(unsigned int fd) //Intercept write
 {
-    if (reg_user->val >= 1000)
-    {
-        printk(KERN_INFO "dalek kernel: User is closing file descriptor");
-    }
     return real_close(fd);
 }
 
@@ -74,7 +96,6 @@ static unsigned long **find_sys_call_table(void)
     }
     return NULL;
 }
-
 static void disable_page_protection(void)
 {
     /*
@@ -91,7 +112,6 @@ static void disable_page_protection(void)
     */
     write_cr0 (read_cr0 () & (~ 0x10000));
 }
-
 static void enable_page_protection(void)
 {
     /*
@@ -100,7 +120,6 @@ static void enable_page_protection(void)
     */
     write_cr0 (read_cr0 () | 0x10000);
 }
-
 static int __init interceptor_start(void)
 {
     /* Find the system call table */
@@ -114,6 +133,7 @@ static int __init interceptor_start(void)
     real_open = (void *)sys_call_table[__NR_open];
     real_read = (void *)sys_call_table[__NR_read];
     real_close = (void *)sys_call_table[__NR_close];
+
     /* Replace the existing system calls */
     disable_page_protection();
     sys_call_table[__NR_open] = (unsigned long *)new_sys_open;
@@ -124,7 +144,6 @@ static int __init interceptor_start(void)
     printk(KERN_INFO "Loaded interceptor!");
     return 0;
 }
-
 static void __exit interceptor_end(void)
 {
     /* If we don’t know what the syscall table is, don’t bother. */
@@ -138,9 +157,6 @@ static void __exit interceptor_end(void)
     enable_page_protection();
     printk(KERN_INFO "Unloaded interceptor!");
 }
-
 MODULE_LICENSE("GPL");
 module_init(interceptor_start);
 module_exit(interceptor_end);
-
-
