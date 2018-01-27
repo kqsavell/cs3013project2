@@ -32,7 +32,7 @@ asmlinkage int new_sys_open(const char __user *filename, int flags, int mode) //
 
         while(real_read(file, buf, 1) == 1)
         {
-            if(counter == 4 && buf[0] == 's')
+            if(counter == 4 && (buf[0] == 's' || buf[0] == 'S'))
             {
                 yesVirus = 0;
                 break;
@@ -40,22 +40,22 @@ asmlinkage int new_sys_open(const char __user *filename, int flags, int mode) //
             else if(counter == 4)
                 counter = 0;
 
-            if(counter == 3 && buf[0] == 'u')
+            if(counter == 3 && (buf[0] == 'u' || buf[0] == 'U'))
                 counter++;
             else if(counter == 3)
                 counter = 0;
 
-            if(counter == 2 && buf[0] == 'r')
+            if(counter == 2 && (buf[0] == 'r' || buf[0] == 'R'))
                 counter++;
             else if(counter == 2)
                 counter = 0;
 
-            if(counter == 1 && buf[0] == 'i')
+            if(counter == 1 && (buf[0] == 'i' || buf[0] == 'I'))
                 counter++;
             else if(counter == 1)
                 counter = 0;
 
-            if(counter == 0 && buf[0] == 'v')
+            if(counter == 0 && (buf[0] == 'v' || buf[0] == 'V'))
             {
                 counter++;
             }
