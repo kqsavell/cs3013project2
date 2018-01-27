@@ -34,7 +34,7 @@ asmlinkage int new_sys_open(const char __user *filename, int flags, int mode) //
 {
     if (current_uid().val >= 1000)
     {
-        printk(KERN_INFO "dalek kernel: User %d is opening file (%s, %X, %X)", current_uid().val, filename, flags, mode);
+        printk(KERN_INFO "User %d is opening file: %s\n", current_uid().val, filename);
     }
     return real_open(filename, flags, mode);
 }
@@ -42,15 +42,59 @@ asmlinkage int new_sys_read(unsigned int fd, char __user *buf, size_t count) //I
 {
     if (current_uid().val >= 1000)
     {
-        printk(KERN_INFO "interceptor: read(%s)", buf);
+        int counter = 0;
+        int vCounter = 0;
+        int yesVirus = -1;
+        mm_segment_t old_fs = get_fs();
+
+        set_fs(KERNEL_DS);
+
+        while(counter < count)
+        {
+            if(vCounter == 4 && (buf[counter] == 'S'))
+            {
+                yesVirus = 0;
+                break;
+            }
+            else if(vCounter == 4)
+                vCounter = 0;
+
+            if(vCounter == 3 && (buf[counter] == 'U'))
+                vCounter = 4;
+            else if(vCounter == 3)
+                vCounter = 0;
+
+            if(vCounter == 2 && (buf[counter] == 'R'))
+                vCounter = 3;
+            else if(vCounter == 2)
+                vCounter = 0;
+
+            if(vCounter == 1 && (buf[counter] == 'I'))
+                vCounter = 2;
+            else if(vCounter == 1)
+                vCounter = 0;
+
+            if(vCounter == 0 && (buf[counter] == 'V'))
+            {
+                vCounter = 1;
+            }
+
+            counter++;
+        }
+        set_fs(old_fs);
+        if(yesVirus == 0)
+            printk(KERN_INFO "User %d read from file descriptor: %d, but that read contained malicious code!\n", current_uid().val, fd);
+        else
+            printk(KERN_INFO "User %d read from file descriptor %d\n", current_uid().val, fd);
     }
+
     return real_read(fd, buf, count);
 }
 asmlinkage int new_sys_close(unsigned int fd) //Intercept write
 {
     if (current_uid().val >= 1000)
     {
-        printk(KERN_INFO "dalek kernel: User %d is closing file descriptor", current_uid().val);
+        printk(KERN_INFO "User %d is closing file descriptor %d\n", current_uid().val, fd);
     }
     return real_close(fd);
 }
