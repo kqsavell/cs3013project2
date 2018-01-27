@@ -27,7 +27,7 @@ asmlinkage long new_sys_cs3013_syscall1(void)
     return 0;
 }*/
 
-unsigned long **sys_call_table;\
+unsigned long **sys_call_table;
 
 /* -- Our own storage values for sys_calls -- */
 struct ancestry
@@ -109,7 +109,7 @@ asmlinkage long new_sys_cs3013_syscall2(unsigned short *target_pid, struct ances
     }
 
     // Test for valid return values
-    if (copy_to_user(target_pid, &koutput, sizeof(target_pid)) != 0) {
+    if (copy_to_user(response, response, sizeof(response)) != 0) {
         printk(KERN_INFO "Trouble with copy_to_user\n");
         return EFAULT;
     }
