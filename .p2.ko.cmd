@@ -1,0 +1,1 @@
+cmd_/home/kylesavell/Documents/project2/p2.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/kylesavell/Documents/project2/p2.ko /home/kylesavell/Documents/project2/p2.o /home/kylesavell/Documents/project2/p2.mod.o ;  true
