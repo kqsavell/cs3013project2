@@ -1,0 +1,1 @@
+cmd_/home/kylesavell/Documents/project2/phase2/procAncestry.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/kylesavell/Documents/project2/phase2/procAncestry.ko /home/kylesavell/Documents/project2/phase2/procAncestry.o /home/kylesavell/Documents/project2/phase2/procAncestry.mod.o ;  true
